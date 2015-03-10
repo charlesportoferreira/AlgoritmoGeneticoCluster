@@ -21,16 +21,12 @@ public class AlgoritmoGenetico {
 
     int capacidade;
     int numeroAtributos;
-    String base;
     String mem;
-    String banco;
 
-    public AlgoritmoGenetico(int capacidadeInicial, String mem, String base, String banco) {
+    public AlgoritmoGenetico(int capacidadeInicial, String mem) {
         capacidade = capacidadeInicial;
         this.cromossomos = new ArrayList<>(2 * capacidade);
-        this.base = base;
         this.mem = mem;
-        this.banco = banco;
 
     }
 
@@ -39,35 +35,14 @@ public class AlgoritmoGenetico {
             cromossomos.add(new Cromossomo(39));
         }
         Random random = new Random();
-        int max = 100;
+        int max = 1;
         int min = 0;
+       
         for (Cromossomo cromossomo : cromossomos) {
-            cromossomo.getGenes().get(0).setValor(random.nextInt(max - min + 1) + min);
-            cromossomo.getGenes().get(1).setValor(random.nextInt(max - min + 1) + min);
-        }
-        max = 1;
-        min = 0;
-        for (Cromossomo cromossomo : cromossomos) {
-            for (int i = 2; i < cromossomo.getGenes().size(); i++) {
+            for (int i = 0; i < cromossomo.getGenes().size(); i++) {
                 cromossomo.getGenes().get(i).setValor(random.nextInt(max - min + 1) + min);
             }
         }
-
-        //Cromossomo tradicional
-        Cromossomo cromossomoTradicional = new Cromossomo(39);
-        cromossomoTradicional.getGenes().get(0).setValor(65);
-        cromossomoTradicional.getGenes().get(1).setValor(30);
-        cromossomoTradicional.getGenes().get(2).setValor(1);
-        for (int i = 3; i < cromossomoTradicional.getGenes().size(); i++) {
-            cromossomoTradicional.getGenes().get(i).setValor(0);
-        }
-
-        cromossomos.add(cromossomoTradicional);
-
-       // cromossomos.stream().forEach((cromossomo) -> {
-            //cromossomo.getConfigGenes();
-            //System.out.println(cromossomo.getConfigGenes());
-        //});
 
     }
 
@@ -156,8 +131,6 @@ public class AlgoritmoGenetico {
         double menorFitness = 100;
         for (Cromossomo cromossomo : cromossomos) {
             cromossomo.memoria = mem;
-            cromossomo.baseDados = base;
-            //cromossomo.bancoDados = banco;
             cromossomo.calculaFitness();
             fitnessMedio += cromossomo.getFitness();
             if (cromossomo.getFitness() < menorFitness) {
