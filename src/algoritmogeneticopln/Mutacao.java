@@ -32,7 +32,7 @@ public class Mutacao {
             c.getGenes().get(posicao).setValor(1);
         }
         
-        c.getConfigGenes();
+        //c.getConfigGenes();
     }
 
 }

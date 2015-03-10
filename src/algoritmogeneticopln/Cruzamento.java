@@ -18,7 +18,7 @@ public class Cruzamento {
         }
         if (fim > c1.getGenes().size()) {
             throw new RuntimeException("Valor de fim maior que a capacidade do cromossomo: "
-                    + c1.getID() + " : " + c1.getGenes().size() + " : " + inicio + " : " + fim);
+                    + " : " + c1.getGenes().size() + " : " + inicio + " : " + fim);
         }
         if (inicio < 0) {
             throw new RuntimeException("Valor de inicio menor que zero");
@@ -44,8 +44,8 @@ public class Cruzamento {
                 filho2.getGenes().get(i).setValor(c1.getGenes().get(i).getValor());
             }
         }
-        filho1.getConfigGenes();
-        filho2.getConfigGenes();
+        //filho1.getConfigGenes();
+        //filho2.getConfigGenes();
         Cromossomo[] cr = new Cromossomo[2];
         cr[0] = filho1;
         cr[1] = filho2;

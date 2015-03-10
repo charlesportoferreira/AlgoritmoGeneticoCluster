@@ -8,29 +8,24 @@ package algoritmogeneticopln;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Transient;
 
 /**
  *
  * @author charleshenriqueportoferreira
  */
-@Entity
+
 public class Resultado implements Serializable{
     
     private String nomeTeste;
     private String nomeClassificador;
-    @Transient
+
     private int qtdeAcertos;
-    @Transient
+  
     private int qtdeErros;
-    @Transient
+
     private String porcentagemErros;
     private String porcentagemAcertos;
-    @Transient
+
     private List<Fold> folds;
     private int numeroAtributos;
     private String cromossomo;
@@ -39,9 +34,7 @@ public class Resultado implements Serializable{
     private double pesoAtributos;
     private double fitness;
     
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long ID;
+  
 
     public double getFitness() {
         return fitness;
@@ -201,12 +194,6 @@ public class Resultado implements Serializable{
 
     }
 
-    public Long getID() {
-        return ID;
-    }
-
-    public void setID(Long ID) {
-        this.ID = ID;
-    }
+   
 
 }

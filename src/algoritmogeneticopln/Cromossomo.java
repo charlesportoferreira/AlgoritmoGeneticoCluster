@@ -11,10 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,8 +20,7 @@ import java.util.logging.Logger;
  *
  * @author charleshenriqueportoferreira
  */
-public class Cromossomo implements Serializable {
-
+public class Cromossomo {
     private List<Gene> genes;
     private double fitness;
     Resultado resultado;
@@ -67,14 +64,14 @@ public class Cromossomo implements Serializable {
 
     public void calculaFitness() {
         Resultado res;
-        CromossomoFacade cf = new CromossomoFacade(bancoDados);
-        List<Cromossomo> lc = cf.find(getConfigGenes(), "Cromossomo", "configGenes");
+        //CromossomoFacade cf = new CromossomoFacade(bancoDados);
+        //List<Cromossomo> lc = cf.find(getConfigGenes(), "Cromossomo", "configGenes");
         //List<Cromossomo> lc = cf.find("1.3,1,0,1,1,0,1,1,0,0,1,1,0,1,1,0,1,1,0,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,1", "Cromossomo", "configGenes");
-        if (lc.isEmpty()) {
+        //if (lc.isEmpty()) {
             res = executaProgramas();
 
             this.resultado = res;
-            resultado.setCromossomo(this.getStringConfiguracao());
+            //resultado.setCromossomo(this.getStringConfiguracao());
             // double f = (res.getPesoClassificacao() * Double.parseDouble(res.getPorcentagemAcertos()))
             //       - (res.getPesoAtributos() * res.getPorcentagemAtributos(nrAtributos));
             double f = Double.parseDouble(res.getPorcentagemAcertos());
@@ -84,29 +81,29 @@ public class Cromossomo implements Serializable {
             System.out.println("   " + f + " : " + res.getNumeroAtributos());
             this.resultado.setFitness(f);
             this.setFitness(f);
-            cf.edit(this);
+           // cf.edit(this);
             this.fitness = f;
-        } else {
+        //} else {
             //ResultadoFacade rf = new ResultadoFacade();
-            res = lc.get(0).getResultado();
-            System.out.println("   " + res.getPorcentagemAcertos() + " : " + res.getNumeroAtributos());
-            this.fitness = lc.get(0).getFitness();
-        }
+          //  res = lc.get(0).getResultado();
+          //  System.out.println("   " + res.getPorcentagemAcertos() + " : " + res.getNumeroAtributos());
+           // this.fitness = lc.get(0).getFitness();
+        //}
     }
 
     private Resultado executaProgramas() {
-        executaPretext();
+        //executaPretext();
         executaWeka();
         Resultado res = leResultado();
         return res;
     }
 
-    private void executaPretext() {
-        String comandoPretext = decodificaCromossomo();
-        //System.out.println(comandoPretext);
-        String diretorio = System.getProperty("user.dir");
-        executaPrograma(comandoPretext, "saidaPretext.txt", "erroPretext.txt");
-    }
+//    private void executaPretext() {
+//        String comandoPretext = decodificaCromossomo();
+//        //System.out.println(comandoPretext);
+//        String diretorio = System.getProperty("user.dir");
+//        executaPrograma(comandoPretext, "saidaPretext.txt", "erroPretext.txt");
+//    }
 
     private void executaWeka() {
         // executaPrograma("cd discover", "saidaWeka.txt", "erroWeka.txt");
@@ -138,106 +135,7 @@ public class Cromossomo implements Serializable {
         return res;
     }
 
-  
-      private String decodificaCromossomo() {
-        //String baseDados = "C50test25";
-        String baseStoplist = "stoplist";
-        String desvio = getDesvio(genes.get(0).getValor());
-        String ngram = getNGram(genes.get(1).getValor());
-        String stoplist = getStopList();
-        return "java -jar PretextExecutor.jar -b " + baseDados + " -ma 0-0 -mf 0-0 -g " + ngram
-                + " -sl " + baseStoplist + " -sf " + stoplist + " -d " + desvio + " -f tfidf";
-    }
-    
-    private String getNGram(double valorNGram) {
-        if (valorNGram >= 0 && valorNGram <= 10) {
-            return "1";
-        }
-        if (valorNGram >= 11 && valorNGram <= 20) {
-            return "2";
-        }
-        if (valorNGram >= 21 && valorNGram <= 30) {
-            return "3";
-        }
-        if (valorNGram >= 31 && valorNGram <= 40) {
-            return "4";
-        }
-        if (valorNGram >= 41 && valorNGram <= 50) {
-            return "1-2";
-        }
-        if (valorNGram >= 51 && valorNGram <= 60) {
-            return "1-3";
-        }
-        if (valorNGram >= 61 && valorNGram <= 70) {
-            return "1-4";
-        }
-        if (valorNGram >= 71 && valorNGram <= 80) {
-            return "2-3";
-        }
-        if (valorNGram >= 81 && valorNGram <= 90) {
-            return "2-4";
-        }
-        if (valorNGram >= 91 && valorNGram <= 100) {
-            return "3-4";
-        }
 
-        throw new AssertionError("Valor nao esperado de ngram: " + valorNGram);
-    }
-    
-     private String getDesvio(double desvio) throws AssertionError {
-        if (desvio >= 0 && desvio <= 10) {
-            return "1.0";
-        }
-        if (desvio >= 11 && desvio <= 20) {
-            return "1.1";
-        }
-        if (desvio >= 21 && desvio <= 30) {
-            return "1.2";
-        }
-        if (desvio >= 31 && desvio <= 40) {
-            return "1.3";
-        }
-        if (desvio >= 41 && desvio <= 50) {
-            return "1.4";
-        }
-        if (desvio >= 51 && desvio <= 60) {
-            return "1.5";
-        }
-        if (desvio >= 61 && desvio <= 70) {
-            return "1.6";
-        }
-        if (desvio >= 71 && desvio <= 80) {
-            return "1.7";
-        }
-        if (desvio >= 81 && desvio <= 90) {
-            return "1.8";
-        }
-        if (desvio >= 91 && desvio <= 100) {
-            return "1.9";
-        }
-
-        throw new AssertionError("Valor nao esperado de desvio: " + desvio);
-    }
-     
-    private String getStopList() {
-        StringBuilder stoplist = new StringBuilder();
-        boolean isParametroSelecionado = false;
-        //comeca da posicao 2 porque essa eh a posicao do array que comecam os bits de stoplist
-        for (int i = 2; i < genes.size(); i++) {
-            if (genes.get(i).getValor() == 1) {
-                stoplist.append(genes.get(i).getNome()).append("-");
-                isParametroSelecionado = true;
-            }
-        }
-
-        //retira a ultima virgula a mais
-        if (isParametroSelecionado) {
-            stoplist.deleteCharAt(stoplist.length() - 1);
-        } else {
-            return "CD";
-        }
-        return stoplist.toString();
-    }
 
     private void criaGenes() {
         genes.add(new Gene("desvio"));

@@ -5,22 +5,14 @@
  */
 package algoritmogeneticopln;
 
-import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
 /**
  *
  * @author debora
  */
-@Entity
-public class Geracao implements Serializable {
+
+public class Geracao  {
    
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long ID;
+  
     private int numero;
     private double melhorFitness;
     private double piorFitness;
@@ -39,13 +31,7 @@ public class Geracao implements Serializable {
     }
 
    
-    public Long getID() {
-        return ID;
-    }
-
-    public void setID(Long ID) {
-        this.ID = ID;
-    }
+   
 
     public double getMelhorFitness() {
         return melhorFitness;

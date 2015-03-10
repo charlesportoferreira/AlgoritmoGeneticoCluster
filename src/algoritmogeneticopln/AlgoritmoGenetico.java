@@ -5,9 +5,7 @@
  */
 package algoritmogeneticopln;
 
-import facade.CromossomoFacade;
-import facade.GeneFacade;
-import facade.GeracaoFacade;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,10 +64,10 @@ public class AlgoritmoGenetico {
 
         cromossomos.add(cromossomoTradicional);
 
-        cromossomos.stream().forEach((cromossomo) -> {
-            cromossomo.getConfigGenes();
-            System.out.println(cromossomo.getConfigGenes());
-        });
+       // cromossomos.stream().forEach((cromossomo) -> {
+            //cromossomo.getConfigGenes();
+            //System.out.println(cromossomo.getConfigGenes());
+        //});
 
     }
 
@@ -87,7 +85,7 @@ public class AlgoritmoGenetico {
         for (int i = 2; i < cr.getGenes().size(); i++) {
             cr.getGenes().get(i).setValor(random.nextInt(max - min + 1) + min);
         }
-        cr.getConfigGenes();
+        //cr.getConfigGenes();
         return cr;
     }
 
@@ -137,7 +135,7 @@ public class AlgoritmoGenetico {
         // }
         Cromossomo multado = cromossomos.get(cromoEscolhido);
         Mutacao.muta(multado, posicao);
-        multado.getConfigGenes();
+       // multado.getConfigGenes();
        // cromossomos.add(multado);
 
         //cria um clone do melhor cromossomo
@@ -146,20 +144,20 @@ public class AlgoritmoGenetico {
             clone1.getGenes().get(i).setValor(cromossomos.get(0).getGenes().get(i).getValor());
         }
         Mutacao.muta(clone1, posicao);
-        clone1.getConfigGenes();
+        //clone1.getConfigGenes();
         cromossomos.add(clone1);
     }
 
     public void seleciona(int numGeracao) {
 
-        CromossomoFacade cf = new CromossomoFacade(banco);
+        //CromossomoFacade cf = new CromossomoFacade(banco);
         System.out.println(cromossomos.size());
         double fitnessMedio = 0.0;
         double menorFitness = 100;
         for (Cromossomo cromossomo : cromossomos) {
             cromossomo.memoria = mem;
             cromossomo.baseDados = base;
-            cromossomo.bancoDados = banco;
+            //cromossomo.bancoDados = banco;
             cromossomo.calculaFitness();
             fitnessMedio += cromossomo.getFitness();
             if (cromossomo.getFitness() < menorFitness) {
@@ -169,20 +167,20 @@ public class AlgoritmoGenetico {
         fitnessMedio = fitnessMedio / cromossomos.size();
 
         cromossomos.clear();
-        cromossomos = cf.find(capacidade);
+        //cromossomos = cf.find(capacidade);
 
         Geracao geracaoAtual = new Geracao();
         geracaoAtual.setNumero(numGeracao);
         geracaoAtual.setMelhorFitness(cromossomos.get(0).getFitness());
         geracaoAtual.setPiorFitness(menorFitness);
         geracaoAtual.setFitnessMedio(fitnessMedio);
-        GeracaoFacade geracaoFacade = new GeracaoFacade(base);
-        geracaoFacade.save(geracaoAtual);
+        //GeracaoFacade geracaoFacade = new GeracaoFacade(base);
+       // geracaoFacade.save(geracaoAtual);
 
-        GeneFacade gf = new GeneFacade(banco);
-        for (Cromossomo cromossomo : cromossomos) {
-            cromossomo.setGenes(gf.find(cromossomo.getID().toString(), "Gene", "cromossomo_ID"));
-        }
+       // GeneFacade gf = new GeneFacade(banco);
+        //for (Cromossomo cromossomo : cromossomos) {
+        //    cromossomo.setGenes(gf.find(cromossomo.getID().toString(), "Gene", "cromossomo_ID"));
+       // }
 
         Iterator it = cromossomos.iterator();
         while (it.hasNext()) {
@@ -194,7 +192,7 @@ public class AlgoritmoGenetico {
         int nrAtributos = cromossomos.get(0).getResultado().getNumeroAtributos();
         String acertos = cromossomos.get(0).getResultado().getPorcentagemAcertos();
         System.out.println("\nMelhor cromossomo " + acertos + " : " + nrAtributos);
-        System.out.println(cromossomos.get(0).getStringConfiguracao());
+       // System.out.println(cromossomos.get(0).getStringConfiguracao());
         System.out.println();
     }
 
