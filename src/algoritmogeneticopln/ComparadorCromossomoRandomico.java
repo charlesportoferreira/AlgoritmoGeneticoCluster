@@ -15,10 +15,10 @@ public class ComparadorCromossomoRandomico implements java.util.Comparator {
     public int compare(Object o1, Object o2) {
         Cromossomo c1 = (Cromossomo) o1;
         Cromossomo c2 = (Cromossomo) o2;
-        if (c1.getFitnessRandomico()> c2.getFitnessRandomico()) {
+        if (c1.getFitness()> c2.getFitness()) {
             return -1;
         }
-        if (c1.getFitnessRandomico()< c2.getFitnessRandomico()) {
+        if (c1.getFitness()< c2.getFitness()) {
             return 1;
         }
 

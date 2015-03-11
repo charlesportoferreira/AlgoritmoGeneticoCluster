@@ -20,18 +20,17 @@ public class AlgoritmoGeneticoCluster {
         int nrIteracoes = 1;
         
         String mem;
-
+        System.out.println("teste");
         if (args.length == 5) {
             populacao = Integer.parseInt(args[0]);
             nrIteracoes = Integer.parseInt(args[1]);
             mem = args[2];
            
         } else {
-            help();
-            System.exit(0);
-            populacao = 4;
-            nrIteracoes = 10;
-           
+           // help();
+           // System.exit(0);
+            populacao = 10;
+            nrIteracoes = 100;
             mem = "1700";
         }
 
@@ -41,7 +40,7 @@ public class AlgoritmoGeneticoCluster {
         for (int i = 0; i < nrIteracoes; i++) {
             System.out.println("Geracao   " + i);
             ag.cruza();
-            ag.muta();
+            //ag.muta();
             ag.seleciona(i);
         }
         System.exit(0);

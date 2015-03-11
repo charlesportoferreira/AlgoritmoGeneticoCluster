@@ -15,25 +15,9 @@ import java.io.Serializable;
 public class Gene implements Serializable{
 
    
-    private Long ID;
     private String nome;
     private int valor;
     boolean isAtivo;
-   
-    private Cromossomo cromossomo;
-
-    public Cromossomo getCromossomo() {
-        return cromossomo;
-    }
-
-    public void setCromossomo(Cromossomo cromossomo) {
-        this.cromossomo = cromossomo;
-    }
-
-    
-
-    
-    
     
     public Gene() {
        // cromossomos = new ArrayList<>();

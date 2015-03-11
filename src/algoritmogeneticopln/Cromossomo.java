@@ -13,6 +13,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
  * @author charleshenriqueportoferreira
  */
 public class Cromossomo {
+
     private List<Gene> genes;
     private double fitness;
     Resultado resultado;
@@ -28,8 +30,10 @@ public class Cromossomo {
     public String memoria;
     public List<String> fileNames = new ArrayList<>();
     public List<String> filePaths = new ArrayList<>();
+    public int nrGenes;
 
     public Cromossomo(int nrBits) {
+        nrGenes = nrBits;
         genes = new ArrayList<>(nrBits);
         criaGenes();
     }
@@ -64,46 +68,28 @@ public class Cromossomo {
 
     public void calculaFitness() {
         Resultado res;
-        //CromossomoFacade cf = new CromossomoFacade(bancoDados);
-        //List<Cromossomo> lc = cf.find(getConfigGenes(), "Cromossomo", "configGenes");
-        //List<Cromossomo> lc = cf.find("1.3,1,0,1,1,0,1,1,0,0,1,1,0,1,1,0,1,1,0,0,0,1,0,0,0,0,0,1,0,0,1,1,0,1,0,1,0,1", "Cromossomo", "configGenes");
-        //if (lc.isEmpty()) {
-            res = executaProgramas();
+        res = executaProgramas();
+        this.resultado = res;
+        double f = Double.parseDouble(res.getPorcentagemAcertos());
+        if (Double.isNaN(f)) {
+            f = 0.0;
+        }
+        System.out.println("   " + f + " : " + res.getNumeroAtributos());
+        this.resultado.setFitness(f);
+        this.setFitness(f);
+    }
 
-            this.resultado = res;
-            //resultado.setCromossomo(this.getStringConfiguracao());
-            // double f = (res.getPesoClassificacao() * Double.parseDouble(res.getPorcentagemAcertos()))
-            //       - (res.getPesoAtributos() * res.getPorcentagemAtributos(nrAtributos));
-            double f = Double.parseDouble(res.getPorcentagemAcertos());
-            if (Double.isNaN(f)) {
-                f = 0.0;
-            }
-            System.out.println("   " + f + " : " + res.getNumeroAtributos());
-            this.resultado.setFitness(f);
-            this.setFitness(f);
-           // cf.edit(this);
-            this.fitness = f;
-        //} else {
-            //ResultadoFacade rf = new ResultadoFacade();
-          //  res = lc.get(0).getResultado();
-          //  System.out.println("   " + res.getPorcentagemAcertos() + " : " + res.getNumeroAtributos());
-           // this.fitness = lc.get(0).getFitness();
-        //}
+    public void calculaFitnessRandomico() {
+        Random random = new Random();
+        int fitnessRandomico = random.nextInt(100 - 0 + 1) + 0;
+        this.setFitness(fitnessRandomico);
     }
 
     private Resultado executaProgramas() {
-        //executaPretext();
         executaWeka();
         Resultado res = leResultado();
         return res;
     }
-
-//    private void executaPretext() {
-//        String comandoPretext = decodificaCromossomo();
-//        //System.out.println(comandoPretext);
-//        String diretorio = System.getProperty("user.dir");
-//        executaPrograma(comandoPretext, "saidaPretext.txt", "erroPretext.txt");
-//    }
 
     private void executaWeka() {
         // executaPrograma("cd discover", "saidaWeka.txt", "erroWeka.txt");
@@ -135,25 +121,11 @@ public class Cromossomo {
         return res;
     }
 
-
-
     private void criaGenes() {
-        genes.add(new Gene("desvio"));
-        genes.add(new Gene("ngram"));
-        String[] stopLists = {"ingl.xml", "CC.xml", "CD.xml", "DT.xml", "EX.xml", "FW.xml", "IN.xml",
-            "JJ.xml", "JJR.xml", "JJS.xml", "LS.xml", "MD.xml", "NN.xml", "NNS.xml", "NNP.xml", "NNPS.xml", "PDT.xml", "POS.xml", "PRP.xml", "PRP$.xml", "RB.xml",
-            "RBR.xml", "RBS.xml", "RP.xml", "SYM.xml", "TO.xml", "UH.xml", "VB.xml", "VBD.xml", "VBG.xml", "VBN.xml", "VBP.xml", "VBZ.xml", "WDT.xml", "WP.xml",
-            "WP$.xml", "WRB.xml"};
-        for (String stopList : stopLists) {
-            genes.add(new Gene(stopList));
+        for (int i = 0; i < nrGenes; i++) {
+            genes.add(new Gene());
         }
-        genes.stream().forEach((gene) -> {
-            gene.setCromossomo(this);
-        });
-
     }
-
-   
 
     @Override
     public String toString() {
@@ -329,13 +301,5 @@ public class Cromossomo {
         return "0";
     }
 
-
-    private String getStringGeneStopList() {
-        StringBuilder geneStoplist = new StringBuilder();
-        for (int i = 2; i < this.getGenes().size(); i++) {
-            geneStoplist.append(",").append(this.getGenes().get(i));
-        }
-        return geneStoplist.toString();
-    }
 
 }

@@ -5,7 +5,6 @@
  */
 package algoritmogeneticopln;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,17 +31,21 @@ public class AlgoritmoGenetico {
 
     public void criaPopulacaoInicial(int tamanho) {
         for (int i = 0; i < tamanho; i++) {
-            cromossomos.add(new Cromossomo(39));
+            cromossomos.add(new Cromossomo(10000));
         }
         Random random = new Random();
         int max = 1;
         int min = 0;
-       
+
         for (Cromossomo cromossomo : cromossomos) {
             for (int i = 0; i < cromossomo.getGenes().size(); i++) {
                 cromossomo.getGenes().get(i).setValor(random.nextInt(max - min + 1) + min);
             }
         }
+
+        cromossomos.stream().forEach((cromossomo) -> {
+            System.out.println(cromossomo.toString());
+        });
 
     }
 
@@ -74,10 +77,9 @@ public class AlgoritmoGenetico {
         int cromo2;
         int maxCromo = cromossomos.size() - 1;
 
-        for (int i = 0; i < (capacidade); i++) {
-            cromossomos.add(getCromossomoRandomico());
-        }
-
+        //for (int i = 0; i < (capacidade); i++) {
+        //    cromossomos.add(getCromossomoRandomico());
+        //}
         List<Cromossomo> filhos = new ArrayList<>();
         for (int i = 0; i < cromossomos.size(); i = i + 2) {
             if (i + 1 >= cromossomos.size()) {
@@ -87,15 +89,15 @@ public class AlgoritmoGenetico {
             posFim = random.nextInt((max - posInicio) + 1) + posInicio;
             cromo1 = random.nextInt(maxCromo - 0 + 1) + 0;
             cromo2 = random.nextInt(maxCromo - 0 + 1) + 0;
+            System.out.println(posInicio + " : " + posFim + " : " + cromo1 + " : " + cromo2);
             Cromossomo[] fs = Cruzamento.cruzaPMX(cromossomos.get(cromo1), cromossomos.get(cromo2), posInicio, posFim);
             filhos.add(fs[0]);
             filhos.add(fs[1]);
         }
         cromossomos.addAll(filhos);
-
-        //for (int i = 0; i < (capacidade / 2); i++) {
-        //   cromossomos.add(getCromossomoRandomico());
-        // }
+        cromossomos.stream().forEach((cromo) -> {
+            System.out.println(cromo.toString());
+        });
     }
 
     public void muta() {
@@ -104,14 +106,14 @@ public class AlgoritmoGenetico {
         int max = cromossomos.size() - 1;
         //seleciona qualquer um menos o melhor cromossomo. de 1 ate max
         int cromoEscolhido = random.nextInt(max - 1 + 1) + 1;
-       // Cromossomo multado = new Cromossomo(39);
+        // Cromossomo multado = new Cromossomo(39);
         // for (int i = 0; i < 39; i++) {
         //   multado.getGenes().get(i).setValor(cromossomos.get(cromoEscolhido).getGenes().get(i).getValor());
         // }
         Cromossomo multado = cromossomos.get(cromoEscolhido);
         Mutacao.muta(multado, posicao);
        // multado.getConfigGenes();
-       // cromossomos.add(multado);
+        // cromossomos.add(multado);
 
         //cria um clone do melhor cromossomo
         Cromossomo clone1 = new Cromossomo(39);
@@ -125,13 +127,12 @@ public class AlgoritmoGenetico {
 
     public void seleciona(int numGeracao) {
 
-        //CromossomoFacade cf = new CromossomoFacade(banco);
         System.out.println(cromossomos.size());
         double fitnessMedio = 0.0;
         double menorFitness = 100;
         for (Cromossomo cromossomo : cromossomos) {
-            cromossomo.memoria = mem;
-            cromossomo.calculaFitness();
+            //cromossomo.calculaFitness();
+            cromossomo.calculaFitnessRandomico();
             fitnessMedio += cromossomo.getFitness();
             if (cromossomo.getFitness() < menorFitness) {
                 menorFitness = cromossomo.getFitness();
@@ -139,33 +140,27 @@ public class AlgoritmoGenetico {
         }
         fitnessMedio = fitnessMedio / cromossomos.size();
 
-        cromossomos.clear();
-        //cromossomos = cf.find(capacidade);
+        cromossomos.sort(new ComparadorCromossomo());
 
         Geracao geracaoAtual = new Geracao();
         geracaoAtual.setNumero(numGeracao);
         geracaoAtual.setMelhorFitness(cromossomos.get(0).getFitness());
         geracaoAtual.setPiorFitness(menorFitness);
         geracaoAtual.setFitnessMedio(fitnessMedio);
-        //GeracaoFacade geracaoFacade = new GeracaoFacade(base);
-       // geracaoFacade.save(geracaoAtual);
-
-       // GeneFacade gf = new GeneFacade(banco);
-        //for (Cromossomo cromossomo : cromossomos) {
-        //    cromossomo.setGenes(gf.find(cromossomo.getID().toString(), "Gene", "cromossomo_ID"));
-       // }
-
+        int i = 0;
         Iterator it = cromossomos.iterator();
         while (it.hasNext()) {
             Cromossomo c = (Cromossomo) it.next();
-            if (c.getGenes().isEmpty()) {
+            if (i >= capacidade) {
                 it.remove();
             }
+            i++;
         }
-        int nrAtributos = cromossomos.get(0).getResultado().getNumeroAtributos();
-        String acertos = cromossomos.get(0).getResultado().getPorcentagemAcertos();
-        System.out.println("\nMelhor cromossomo " + acertos + " : " + nrAtributos);
-       // System.out.println(cromossomos.get(0).getStringConfiguracao());
+        System.out.println("Melhor cromossomo: " + cromossomos.get(0));
+//        int nrAtributos = cromossomos.get(0).getResultado().getNumeroAtributos();
+//        String acertos = cromossomos.get(0).getResultado().getPorcentagemAcertos();
+//        System.out.println("\nMelhor cromossomo " + acertos + " : " + nrAtributos);
+        // System.out.println(cromossomos.get(0).getStringConfiguracao());
         System.out.println();
     }
 
