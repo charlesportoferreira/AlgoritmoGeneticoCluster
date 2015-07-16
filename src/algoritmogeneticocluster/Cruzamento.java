@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package algoritmogeneticopln;
+package algoritmogeneticocluster;
 
 /**
  *
@@ -24,9 +24,7 @@ public class Cruzamento {
             throw new RuntimeException("Valor de inicio menor que zero");
         }
 
-        //arrumar a configuracao dos genes
         Cromossomo filho1 = new Cromossomo(c1.getGenes().size());
-
         for (int i = 0; i < filho1.getGenes().size(); i++) {
             if (i >= inicio && i <= fim) {
                 filho1.getGenes().get(i).setValor(c1.getGenes().get(i).getValor());
@@ -36,7 +34,6 @@ public class Cruzamento {
         }
 
         Cromossomo filho2 = new Cromossomo(c1.getGenes().size());
-
         for (int i = 0; i < filho2.getGenes().size(); i++) {
             if (i >= inicio && i <= fim) {
                 filho2.getGenes().get(i).setValor(c2.getGenes().get(i).getValor());
@@ -44,8 +41,6 @@ public class Cruzamento {
                 filho2.getGenes().get(i).setValor(c1.getGenes().get(i).getValor());
             }
         }
-        //filho1.getConfigGenes();
-        //filho2.getConfigGenes();
         Cromossomo[] cr = new Cromossomo[2];
         cr[0] = filho1;
         cr[1] = filho2;

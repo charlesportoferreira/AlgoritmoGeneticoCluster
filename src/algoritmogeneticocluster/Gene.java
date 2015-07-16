@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package algoritmogeneticopln;
+package algoritmogeneticocluster;
 
 import java.io.Serializable;
 
@@ -20,9 +20,12 @@ public class Gene implements Serializable{
     boolean isAtivo;
     
     public Gene() {
-       // cromossomos = new ArrayList<>();
     }
 
+    public Gene(int valor) {
+        this.valor = valor;
+    }
+    
     public Gene(String nome) {
         this.nome = nome;
     }
