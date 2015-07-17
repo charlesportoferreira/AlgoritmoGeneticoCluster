@@ -40,19 +40,20 @@ public class WekaSimulation {
             eval = new Evaluation(data);
             Random rand = new Random(1); // using seed = 1
             int folds = 10;
+            eval.crossValidateModel(classifier, data, folds, rand);
             System.out.println(eval.toString());
             System.out.println(eval.numInstances());
             System.out.println(eval.correct());
             System.out.println(eval.incorrect());
             System.out.println(eval.pctCorrect());
             System.out.println(eval.pctIncorrect());
-            
+
         } catch (Exception ex) {
             Logger.getLogger(WekaSimulation.class.getName()).log(Level.SEVERE, null, ex);
         }
-       
+
     }
-    
+
     public static BufferedReader readDataFile(String filename) {
         BufferedReader inputReader = null;
 
@@ -64,6 +65,5 @@ public class WekaSimulation {
 
         return inputReader;
     }
-    
 
 }

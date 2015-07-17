@@ -5,12 +5,19 @@
  */
 package algoritmogeneticocluster;
 
+import static algoritmogeneticocluster.WekaSimulation.readDataFile;
+import convertclustertotav.ConvertClusterToTAV;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import weka.classifiers.Evaluation;
+import weka.classifiers.functions.SMO;
+import weka.core.Instances;
 
 /**
  *
@@ -21,10 +28,15 @@ public class Cromossomo implements Callable<String> {
     private List<Gene> genes;
     private double fitness;
     private double probSelecao;
+    private static Long id = 0L;
+    private final Long inId;
 
     public Cromossomo(int nrBits) {
+        inId = id;
+        id++;
         genes = new ArrayList<>(nrBits);
         criaGenes(nrBits);
+        System.out.println("Meu ID: " + this.inId);
     }
 
     public List<Gene> getGenes() {
@@ -36,6 +48,9 @@ public class Cromossomo implements Callable<String> {
     }
 
     public double getFitness() {
+        if (fitness == 0) {
+            calculaFitness();
+        }
         return fitness;
     }
 
@@ -53,7 +68,10 @@ public class Cromossomo implements Callable<String> {
     }
 
     private void calculaFitness() {
-        simulaFitness();
+        int[] decodicacao = decodificaCromossomo();
+        criaArff(decodicacao);
+        classifica();
+        limparDados();
     }
 
     public double getProbSelecao() {
@@ -71,14 +89,66 @@ public class Cromossomo implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        System.out.println("Vou esperar 10 segundos");
+        calculaFitness();
+        return String.valueOf("Meu fitness: " + fitness);
+    }
+
+    private int[] decodificaCromossomo() {
+        int pos = 0;
+        ArrayList<Integer> listDecodificacao = new ArrayList<>();
+        for (int i = genes.size() - 1; i >= 0; i--) {
+            if (genes.get(i).getValor() == 1) {
+                listDecodificacao.add(i);
+            }
+        }
+        int i = 0;
+        int[] array = new int[listDecodificacao.size()];
+        for (int decodicacao : listDecodificacao) {
+            array[i] = decodicacao;
+            i++;
+        }
+
+        return array;
+    }
+
+    private void criaArff(int[] decodificacao) {
+        ConvertClusterToTAV cc = new ConvertClusterToTAV();
         try {
-            Thread.sleep(5000);
-        } catch (InterruptedException ex) {
+            cc.convert("cluster.txt", inId + ".arff", decodificacao);
+        } catch (IOException ex) {
             Logger.getLogger(Cromossomo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.calculaFitness();
-        return String.valueOf("Meu fitness: " + fitness);
+    }
+
+    private void classifica() {
+        SMO classifier = new SMO();
+
+        BufferedReader datafile = readDataFile(inId + ".arff");
+
+        Instances data;
+        Evaluation eval;
+        try {
+            data = new Instances(datafile);
+            data.setClassIndex(data.numAttributes() - 1);
+            eval = new Evaluation(data);
+            Random rand = new Random(1); // using seed = 1
+            int folds = 10;
+            eval.crossValidateModel(classifier, data, folds, rand);
+            this.fitness = eval.pctCorrect();
+
+        } catch (Exception ex) {
+            Logger.getLogger(WekaSimulation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    private void limparDados() {
+        try {
+            Runtime.getRuntime().exec("rm " + inId + ".arff");
+        } catch (IOException ex) {
+            Logger.getLogger(Cromossomo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
 }

@@ -27,10 +27,12 @@ public class AlgoritmoGeneticoCluster {
      */
     public static void main(String[] args) {
         AlgoritmoGeneticoCluster ag = new AlgoritmoGeneticoCluster();
-        ag.criaPopulacaoInicial(5, 4);
-//        ag.cruza();
-        ag.muta();
-        ag.seleciona();
+        ag.criaPopulacaoInicial(5, 10);
+        for (int i = 0; i < 1; i++) {
+            ag.cruza();
+            ag.muta();
+            ag.seleciona();
+        }
     }
 
     public AlgoritmoGeneticoCluster() {
@@ -107,14 +109,6 @@ public class AlgoritmoGeneticoCluster {
         pool.shutdown();
 
         int nrCromo = cromossomos.size();
-//        cromossomos.get(0).setFitness(10);
-//        cromossomos.get(1).setFitness(20);
-//        cromossomos.get(2).setFitness(30);
-//        cromossomos.get(3).setFitness(40);
-//        cromossomos.get(4).setFitness(50);
-//        for (Cromossomo c : cromossomos) {
-//            c.simulaFitness();
-//        }
 
         double somatorio = 0;
         somatorio = cromossomos.stream().map((c) -> c.getFitness()).reduce(somatorio, (accumulator, _item) -> accumulator + _item);
@@ -135,10 +129,12 @@ public class AlgoritmoGeneticoCluster {
 
         Random rand = new Random();
         int selecao = rand.nextInt(100 - 0 + 1) + 0;
-        System.out.println("selecacao: " + selecao);
+        System.out.println("selecao: " + selecao);
         for (int i = 1; i < roleta.length; i++) {
             if (selecao >= roleta[i - 1] && selecao < roleta[i]) {
-                System.out.println("Cromossomo selecionado: " + cromossomos.get(i - 1).getProbSelecao());
+                System.out.println("Cromossomo selecionado: "
+                        + cromossomos.get(i - 1).getProbSelecao()
+                        + " F: " + cromossomos.get(i - 1).getFitness());
                 break;
             }
         }
