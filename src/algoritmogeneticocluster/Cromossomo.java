@@ -9,6 +9,8 @@ import static algoritmogeneticocluster.WekaSimulation.readDataFile;
 import convertclustertotav.ConvertClusterToTAV;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -36,7 +38,7 @@ public class Cromossomo implements Callable<String> {
         id++;
         genes = new ArrayList<>(nrBits);
         criaGenes(nrBits);
-        System.out.println("Meu ID: " + this.inId);
+//        System.out.println("Meu ID: " + this.inId);
     }
 
     public List<Gene> getGenes() {
@@ -68,6 +70,7 @@ public class Cromossomo implements Callable<String> {
     }
 
     private void calculaFitness() {
+        
         int[] decodicacao = decodificaCromossomo();
         criaArff(decodicacao);
         classifica();
@@ -89,7 +92,7 @@ public class Cromossomo implements Callable<String> {
 
     @Override
     public String call() throws Exception {
-        calculaFitness();
+        getFitness();
         return String.valueOf("Meu fitness: " + fitness);
     }
 
@@ -135,8 +138,10 @@ public class Cromossomo implements Callable<String> {
             int folds = 10;
             eval.crossValidateModel(classifier, data, folds, rand);
             this.fitness = eval.pctCorrect();
+            fitness = new BigDecimal(fitness).setScale(2, RoundingMode.HALF_UP).doubleValue();//arredondamento para duas casas
 
         } catch (Exception ex) {
+            System.out.println("Erro ao tentar fazer a classificacao");
             Logger.getLogger(WekaSimulation.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -150,5 +155,7 @@ public class Cromossomo implements Callable<String> {
         }
 
     }
+    
+     
 
 }

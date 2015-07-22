@@ -21,7 +21,7 @@ public class Mutacao {
         } else {
             c.getGenes().get(posicao).setValor(1);
         }
-        System.out.println(c.getGenes().toString());
+//        System.out.println(c.getGenes().toString());
     }
 
 }
