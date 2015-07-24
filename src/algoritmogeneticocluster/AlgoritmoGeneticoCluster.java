@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -32,6 +35,8 @@ public class AlgoritmoGeneticoCluster {
      */
     public static void main(String[] args) {
 
+        
+        
         try {
             Runtime.getRuntime().exec("rm *.arff");
         } catch (IOException ex) {
@@ -42,10 +47,10 @@ public class AlgoritmoGeneticoCluster {
             //help();
         }
         AlgoritmoGeneticoCluster ag = new AlgoritmoGeneticoCluster();
-        int tamanhoPopulacao = 2;//Integer.parseInt(args[0]);
+        int tamanhoPopulacao = 10;//Integer.parseInt(args[0]);
         int numeroGenes = 79;//Integer.parseInt(args[1]);
         ag.criaPopulacaoInicial(tamanhoPopulacao, numeroGenes);
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 10000; i++) {
             System.out.println("---------------  Geracao: " + i + " ---------------");
             ag.cruza();
             ag.muta();
@@ -158,7 +163,7 @@ public class AlgoritmoGeneticoCluster {
             roleta[i] = roleta[i - 1] + cromossomos.get(i - 1).getProbSelecao();
         }
         roleta[nrCromo] = 100;
-        System.out.println("Roleta: " + Arrays.toString(roleta));
+//        System.out.println("Roleta: " + Arrays.toString(roleta));
 
         Random rand = new Random();
         int selecao;
@@ -176,21 +181,34 @@ public class AlgoritmoGeneticoCluster {
                 }
             }
         }
-
-        selecionados.stream().forEach((selecionado) -> {
-            System.out.println("Cromossomo selecionado: "
-                    + " F: " + selecionado.getFitness());
-        });
+//        System.exit(0);
+        System.out.print("Selecionados:\t");
+        HashMap<Double, Integer> map = new HashMap<>();
+        int count;
+        for (Cromossomo selecionado : selecionados) {
+            System.out.print(selecionado.getFitness() + "\t");
+            if (map.containsKey(selecionado.getFitness())) {
+                count = map.get(selecionado.getFitness());
+                count++;
+                map.put(selecionado.getFitness(), count);
+            } else {
+                map.put(selecionado.getFitness(), 1);
+            }
+        }
+//        selecionados.stream().forEach((selecionado) -> {
+//            
+//        });
+        System.out.println("");
         cromossomos = selecionados;
 
-        if (populacaoConvergiu()) {
+        if (!populacaoConvergiu(map)) {
             numMutacoes = cromossomos.size() - 1;
             System.out.println("-------------- Convergiu !!!!!!!---------------------");
         } else {
             numMutacoes = 1;
         }
 
-        System.out.println("M: " + cromossomos.get(0).getGenes().toString());
+//        System.out.println("M: " + cromossomos.get(0).getGenes().toString());
     }
 
     private boolean populacaoConvergiu() {
@@ -204,5 +222,27 @@ public class AlgoritmoGeneticoCluster {
         count = 100 * count / cromossomos.size();
         System.out.println("% convergencia: " + count + " mutacoes: " + numMutacoes);
         return count >= 80.0;
+    }
+
+    private boolean populacaoConvergiu(HashMap<Double, Integer> map) {
+        int count;
+        int max = 0;
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pair = (Map.Entry) it.next();
+            count = (int) pair.getValue();
+            count = 100 * count / cromossomos.size();
+            if (count > max) {
+                max = count;
+            }
+            if (count >= 80.0) {
+                System.out.println("% convergencia: " + count + " mutacoes: " + numMutacoes);
+                return true;
+            }
+//            System.out.println(pair.getKey() + " = " + pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        System.out.println("% convergencia: " + max + " mutacoes: " + numMutacoes);
+        return false;
     }
 }
