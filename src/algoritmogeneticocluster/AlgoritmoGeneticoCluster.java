@@ -7,7 +7,6 @@ package algoritmogeneticocluster;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,14 +28,15 @@ public class AlgoritmoGeneticoCluster {
 
     List<Cromossomo> cromossomos;
     int numMutacoes = 1;
+    int tipoMutacao = 0;
+    int metodoSelecao = 0;
+    int fixedFitness = 0;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-
-        
-        
+        List<Cromossomo> evoluidos = new ArrayList<>();
         try {
             Runtime.getRuntime().exec("rm *.arff");
         } catch (IOException ex) {
@@ -49,13 +49,39 @@ public class AlgoritmoGeneticoCluster {
         AlgoritmoGeneticoCluster ag = new AlgoritmoGeneticoCluster();
         int tamanhoPopulacao = 10;//Integer.parseInt(args[0]);
         int numeroGenes = 79;//Integer.parseInt(args[1]);
-        ag.criaPopulacaoInicial(tamanhoPopulacao, numeroGenes);
-        for (int i = 0; i < 10000; i++) {
+        ag.criaPopulacaoInicial(tamanhoPopulacao * 5, numeroGenes);
+        for (int i = 0; i < 200; i++) {
+            separateEvolution(i, evoluidos, ag, tamanhoPopulacao, numeroGenes);
             System.out.println("---------------  Geracao: " + i + " ---------------");
             ag.cruza();
             ag.muta();
             ag.seleciona(tamanhoPopulacao);
+            printTheBest(evoluidos);
         }
+    }
+
+    private static void separateEvolution(int i, List<Cromossomo> evoluidos, AlgoritmoGeneticoCluster ag, int tamanhoPopulacao, int numeroGenes) {
+        if (i != 0 && i % 20 == 0 && i <= 100) {
+            evoluidos.add(ag.cromossomos.get(0));
+            evoluidos.add(ag.cromossomos.get(1));
+            ag.cromossomos = new ArrayList<>();
+            if (i != 100) {
+                ag.criaPopulacaoInicial(tamanhoPopulacao, numeroGenes);
+            }
+        }
+        if (i == 100) {
+            evoluidos.stream().forEach((evoluido) -> {
+                ag.cromossomos.add(evoluido);
+            });
+        }
+    }
+
+    private static void printTheBest(List<Cromossomo> evoluidos) {
+        System.out.print("The Best: ");
+        evoluidos.stream().forEach((evoluido) -> {
+            System.out.print(evoluido.getFitness() + " ");
+        });
+        System.out.println("");
     }
 
     private static void help() {
@@ -109,24 +135,33 @@ public class AlgoritmoGeneticoCluster {
     }
 
     public void muta() {
-
-        for (int i = 0; i < numMutacoes; i++) {
-            Random random = new Random();
-            int maxCromo = cromossomos.size() - 1;
-            int minCromo = 1;
-            int maxMuta = cromossomos.get(0).getGenes().size() - 1;
-            int minMuta = 0;
-            int posCromo = random.nextInt(maxCromo - minCromo + 1) + minCromo;
-            int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
+        Random random = new Random();
+        if (tipoMutacao == 0) {
+            for (int i = 0; i < numMutacoes; i++) {
+                int maxCromo = cromossomos.size() - 1;
+                int minCromo = 1;
+                int maxMuta = cromossomos.get(0).getGenes().size() - 1;
+                int minMuta = 0;
+                int posCromo = random.nextInt(maxCromo - minCromo + 1) + minCromo;
+                int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
 //        System.out.println("posCromo: " + posCromo + " posMuta: " + posMutacao);
-            Mutacao.muta(cromossomos.get(posCromo), posMutacao);
+                Mutacao.muta(cromossomos.get(posCromo), posMutacao);
+            }
+        } else {
+            for (int i = 1; i < cromossomos.size(); i++) {
+                int maxMuta = cromossomos.get(0).getGenes().size() - 1;
+                int minMuta = 0;
+                int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
+                Mutacao.muta(cromossomos.get(i), posMutacao);
+            }
         }
     }
 
     public void seleciona(int tamanhoPopulacao) {
         System.out.println("calculando fitness");
         List<Future> futures = new ArrayList<>();
-        ExecutorService pool = Executors.newFixedThreadPool(cromossomos.size());
+//        ExecutorService pool = Executors.newFixedThreadPool(4);
+        ExecutorService pool = Executors.newWorkStealingPool();
         for (Cromossomo cromossomo : cromossomos) {
             Future f = pool.submit(cromossomo);
             futures.add(f);
@@ -142,9 +177,14 @@ public class AlgoritmoGeneticoCluster {
         }
         pool.shutdown();
 
+//        if (1 == 1) {
+//            return;
+//        }
         List<Cromossomo> selecionados = new ArrayList<>();
         Collections.sort(cromossomos, (Cromossomo c1, Cromossomo c2) -> new Double(c1.getFitness()).compareTo(c2.getFitness()));
-        selecionados.add(cromossomos.get(cromossomos.size() - 1));
+        for (int i = 0; i < 3; i++) {
+            selecionados.add(cromossomos.get(cromossomos.size() - i - 1));
+        }
 
         int nrCromo = cromossomos.size();
 
@@ -169,7 +209,7 @@ public class AlgoritmoGeneticoCluster {
         int selecao;
         System.out.println("Selecionando...");
 
-        for (int j = 1; j < tamanhoPopulacao; j++) {
+        for (int j = 3; j < tamanhoPopulacao; j++) {
             selecao = rand.nextInt(100 - 0 + 1) + 0;
             for (int i = 1; i < roleta.length; i++) {
                 if (selecao >= roleta[i - 1] && selecao < roleta[i]) {
@@ -201,7 +241,7 @@ public class AlgoritmoGeneticoCluster {
         System.out.println("");
         cromossomos = selecionados;
 
-        if (!populacaoConvergiu(map)) {
+        if (populacaoConvergiu(map)) {
             numMutacoes = cromossomos.size() - 1;
             System.out.println("-------------- Convergiu !!!!!!!---------------------");
         } else {
@@ -227,6 +267,7 @@ public class AlgoritmoGeneticoCluster {
     private boolean populacaoConvergiu(HashMap<Double, Integer> map) {
         int count;
         int max = 0;
+        double value;
         Iterator it = map.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry pair = (Map.Entry) it.next();
@@ -236,13 +277,20 @@ public class AlgoritmoGeneticoCluster {
                 max = count;
             }
             if (count >= 80.0) {
-                System.out.println("% convergencia: " + count + " mutacoes: " + numMutacoes);
+                value = (double) pair.getKey();
+                if (value == cromossomos.get(0).getFitness()) {
+                    tipoMutacao = 1;
+                } else {
+                    tipoMutacao = 0;
+                }
+                System.out.println("% convergencia: " + count + " mutacoes: " + numMutacoes + " tipo de mutacao: " + tipoMutacao);
                 return true;
             }
+            tipoMutacao = 0;
 //            System.out.println(pair.getKey() + " = " + pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
-        System.out.println("% convergencia: " + max + " mutacoes: " + numMutacoes);
+        System.out.println("% convergencia: " + max + " mutacoes: " + numMutacoes + " tipo de mutacao: " + tipoMutacao);
         return false;
     }
 }

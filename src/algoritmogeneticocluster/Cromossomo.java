@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SMO;
+import weka.classifiers.misc.HyperPipes;
 import weka.core.Instances;
 
 /**
@@ -125,6 +126,8 @@ public class Cromossomo implements Callable<String> {
 
     private void classifica() {
         SMO classifier = new SMO();
+        
+//        HyperPipes classifier = new HyperPipes();
 
         BufferedReader datafile = readDataFile(inId + ".arff");
 
