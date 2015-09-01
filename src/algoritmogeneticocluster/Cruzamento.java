@@ -24,7 +24,7 @@ public class Cruzamento {
             throw new RuntimeException("Valor de inicio menor que zero");
         }
 
-        Cromossomo filho1 = new Cromossomo(c1.getGenes().size());
+        Cromossomo filho1 = new Cromossomo(c1.getGenes().size(), c1.getMetodoFitness());
         for (int i = 0; i < filho1.getGenes().size(); i++) {
             if (i >= inicio && i <= fim) {
                 filho1.getGenes().get(i).setValor(c1.getGenes().get(i).getValor());
@@ -33,7 +33,7 @@ public class Cruzamento {
             }
         }
 
-        Cromossomo filho2 = new Cromossomo(c1.getGenes().size());
+        Cromossomo filho2 = new Cromossomo(c1.getGenes().size(), c1.getMetodoFitness());
         for (int i = 0; i < filho2.getGenes().size(); i++) {
             if (i >= inicio && i <= fim) {
                 filho2.getGenes().get(i).setValor(c2.getGenes().get(i).getValor());

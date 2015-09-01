@@ -33,17 +33,35 @@ public class Cromossomo implements Callable<String> {
     private double probSelecao;
     private static Long id = 0L;
     private final Long inId;
+    private double pctAcerto;
+    private double microAverage;
+    private double macroAverage;
+    public static int PCT_ACERTOS = 1;
+    public static int MICRO_AVERAGE = 2;
+    public static int MACRO_AVERAGE = 3;
+    private int metodoFitness;
 
-    public Cromossomo(int nrBits) {
+    public Cromossomo(int nrBits, int metodoFitness) {
         inId = id;
         id++;
         genes = new ArrayList<>(nrBits);
         criaGenes(nrBits);
+        this.metodoFitness = metodoFitness;
 //        System.out.println("Meu ID: " + this.inId);
     }
 
     public List<Gene> getGenes() {
         return genes;
+    }
+
+    public int countGenesSelecionados() {
+        int count = 0;
+        for (Gene gene : genes) {
+            if (gene.getValor() == 0) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public void setGenes(List<Gene> genes) {
@@ -71,7 +89,7 @@ public class Cromossomo implements Callable<String> {
     }
 
     private void calculaFitness() {
-        
+
         int[] decodicacao = decodificaCromossomo();
         criaArff(decodicacao);
         classifica();
@@ -126,9 +144,8 @@ public class Cromossomo implements Callable<String> {
 
     private void classifica() {
         SMO classifier = new SMO();
-        
-//        HyperPipes classifier = new HyperPipes();
 
+//        HyperPipes classifier = new HyperPipes();
         BufferedReader datafile = readDataFile(inId + ".arff");
 
         Instances data;
@@ -137,15 +154,35 @@ public class Cromossomo implements Callable<String> {
             data = new Instances(datafile);
             data.setClassIndex(data.numAttributes() - 1);
             eval = new Evaluation(data);
-            Random rand = new Random(1); // using seed = 1
+            Random rand = new Random(1); // usando semente = 1
             int folds = 10;
             eval.crossValidateModel(classifier, data, folds, rand);
-            this.fitness = eval.pctCorrect();
-            fitness = new BigDecimal(fitness).setScale(2, RoundingMode.HALF_UP).doubleValue();//arredondamento para duas casas
+            //this.fitness = eval.pctCorrect();
+            //fitness = new BigDecimal(fitness).setScale(2, RoundingMode.HALF_UP).doubleValue();//arredondamento para duas casas
+            pctAcerto = eval.pctCorrect();
+            pctAcerto = new BigDecimal(pctAcerto).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            microAverage = getMicroAverage(eval, data);
+            microAverage = new BigDecimal(microAverage).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            macroAverage = getMacroAverage(eval, data);
+            macroAverage = new BigDecimal(macroAverage).setScale(2, RoundingMode.HALF_UP).doubleValue();
 
         } catch (Exception ex) {
             System.out.println("Erro ao tentar fazer a classificacao");
             Logger.getLogger(WekaSimulation.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        switch (metodoFitness) {
+            case 1:
+                fitness = pctAcerto;
+                break;
+            case 2:
+                fitness = microAverage;
+                break;
+            case 3:
+                fitness = macroAverage;
+                break;
+            default:
+                break;
         }
 
     }
@@ -158,7 +195,59 @@ public class Cromossomo implements Callable<String> {
         }
 
     }
-    
-     
+
+    private double getMacroAverage(Evaluation eval, Instances data) {
+        double macroMeasure;
+        double macroPrecision = 0;
+        double macrorecall = 0;
+
+        for (int i = 0; i < data.numClasses(); i++) {
+            macroPrecision += eval.precision(i);
+            macrorecall += eval.recall(i);
+        }
+        macroPrecision = macroPrecision / data.numClasses();
+        macrorecall = macrorecall / data.numClasses();
+        macroMeasure = (macroPrecision * macrorecall * 2) / (macroPrecision + macrorecall);
+        //System.out.println("macroMeasure: " + macroMeasure);
+
+        return macroMeasure;
+    }
+
+    private double getMicroAverage(Evaluation eval, Instances data) {
+        double TP = 0;
+        double TP_plus_FP = 0;
+        double TP_plus_FN = 0;
+        double microPrecision;
+        double microRecall;
+        double microMeasure;
+
+        for (int i = 0; i < data.numClasses(); i++) {
+            TP += eval.truePositiveRate(i);
+            TP_plus_FP += eval.truePositiveRate(i) + eval.falsePositiveRate(i);
+            TP_plus_FN += eval.truePositiveRate(i) + eval.falseNegativeRate(i);
+        }
+        microPrecision = TP / TP_plus_FP;
+        microRecall = TP / TP_plus_FN;
+        microMeasure = (microPrecision * microRecall * 2) / (microPrecision + microRecall);
+
+        //System.out.println("microMeasure: " + microMeasure);
+        return microMeasure;
+    }
+
+    public double getPctAcerto() {
+        return pctAcerto;
+    }
+
+    public double getMicroAverage() {
+        return microAverage;
+    }
+
+    public double getMacroAverage() {
+        return macroAverage;
+    }
+
+    public int getMetodoFitness() {
+        return metodoFitness;
+    }
 
 }
