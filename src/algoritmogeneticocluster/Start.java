@@ -28,7 +28,7 @@ public class Start {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        int geracoes = 200;
+        int geracoes = 500;
         int metodoFitness = 1;
         if (args.length > 0) {
             try {

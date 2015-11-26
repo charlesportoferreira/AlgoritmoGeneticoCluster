@@ -82,6 +82,28 @@ public class AlgoritmoGeneticoCluster {
     }
 
     public void muta() {
+//        Random random = new Random();
+//        if (tipoMutacao == 0) {
+//            for (int i = 0; i < numMutacoes; i++) {
+//                int maxCromo = cromossomos.size() - 1;
+//                int minCromo = 1;
+//                int maxMuta = cromossomos.get(0).getGenes().size() - 1;
+//                int minMuta = 0;
+//                int posCromo = random.nextInt(maxCromo - minCromo + 1) + minCromo;
+//                int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
+////        System.out.println("posCromo: " + posCromo + " posMuta: " + posMutacao);
+//                Mutacao.muta(cromossomos.get(posCromo), posMutacao);
+//            }
+//        } else {
+//            for (int i = 1; i < cromossomos.size(); i++) {
+//                int maxMuta = cromossomos.get(0).getGenes().size() - 1;
+//                int minMuta = 0;
+//                int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
+//                Mutacao.muta(cromossomos.get(i), posMutacao);
+//            }
+//            cruza();
+//        }
+        System.out.println("Antes da mutacao " + cromossomos.size());
         Random random = new Random();
         if (tipoMutacao == 0) {
             for (int i = 0; i < numMutacoes; i++) {
@@ -92,17 +114,21 @@ public class AlgoritmoGeneticoCluster {
                 int posCromo = random.nextInt(maxCromo - minCromo + 1) + minCromo;
                 int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
 //        System.out.println("posCromo: " + posCromo + " posMuta: " + posMutacao);
-                Mutacao.muta(cromossomos.get(posCromo), posMutacao);
+
+                cromossomos.add(Mutacao.muta(cromossomos.get(posCromo), posMutacao));
             }
         } else {
-            for (int i = 1; i < cromossomos.size(); i++) {
+            int max = cromossomos.size();
+            for (int i = 1; i < max; i++) {
                 int maxMuta = cromossomos.get(0).getGenes().size() - 1;
                 int minMuta = 0;
                 int posMutacao = random.nextInt(maxMuta - minMuta + 1) + minMuta;
-                Mutacao.muta(cromossomos.get(i), posMutacao);
+
+                cromossomos.add(Mutacao.muta(cromossomos.get(i), posMutacao));
             }
-            cruza();
+            // cruza();
         }
+        System.out.println("Apos a mutacao " + cromossomos.size());
     }
 
     public void seleciona(int tamanhoPopulacao) {
