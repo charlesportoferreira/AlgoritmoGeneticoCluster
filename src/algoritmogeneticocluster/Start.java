@@ -7,6 +7,7 @@ package algoritmogeneticocluster;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -24,10 +25,13 @@ import java.util.logging.Logger;
  */
 public class Start {
 
+    public static List<String> filePaths = new ArrayList<>();
+    
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+        limpaDados();
         int geracoes = 500;
         int metodoFitness = 1;
         if (args.length > 0) {
@@ -161,6 +165,44 @@ public class Start {
             bw.close();
             fw.close();
         }
+    }
+    
+     public static List<String> fileTreePrinter(File initialPath, int initialDepth) {
+
+        int depth = initialDepth++;
+        if (initialPath.exists()) {
+            File[] contents = initialPath.listFiles();
+            for (File content : contents) {
+                if (content.isDirectory()) {
+                    fileTreePrinter(content, initialDepth + 1);
+                } else {
+                    char[] dpt = new char[initialDepth];
+                    for (int j = 0; j < initialDepth; j++) {
+                        dpt[j] = '+';
+                    }
+                    // System.out.println(new String(dpt) + content.getName() + " " + content.getPath() );
+                    //System.out.println(content.toString());
+
+                  
+                        if (content.getName().contains(".arff")) {
+                            filePaths.add(content.toString());
+                        }
+                   
+
+                }
+            }
+        }
+        return filePaths;
+    }
+    
+       private static void limpaDados() {
+        String diretorio = System.getProperty("user.dir");
+        fileTreePrinter(new File(diretorio), 0);
+        for (String filePath : filePaths) {
+            System.out.println(filePath);
+            new File(filePath).delete();
+        }
+
     }
 
 }
